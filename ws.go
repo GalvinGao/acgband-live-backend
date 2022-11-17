@@ -46,7 +46,7 @@ func (s liveServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		fanout([]byte("servermsg " + msg))
+		fanout([]byte("servermsg " + currentClock() + " " + msg))
 		w.WriteHeader(http.StatusNoContent)
 		return
 	}
@@ -89,7 +89,7 @@ func (s liveServer) readPump(ctx context.Context, c *websocket.Conn, l *rate.Lim
 	switch op {
 	case "clienthello":
 		// echo back server time
-		err = c.Write(ctx, websocket.MessageText, []byte("serverhello "+strconv.FormatInt(start.Nanoseconds(), 10)+" "+strconv.FormatInt(time.Since(baseTime).Nanoseconds(), 10)))
+		err = c.Write(ctx, websocket.MessageText, []byte("serverhello "+strconv.FormatInt(start.Nanoseconds(), 10)+" "+currentClock()))
 		if err != nil {
 			return err
 		}
@@ -114,4 +114,8 @@ func (s liveServer) writePump(ctx context.Context, c *websocket.Conn) error {
 	clients.mu.Unlock()
 
 	select {}
+}
+
+func currentClock() string {
+	return strconv.FormatInt(time.Since(baseTime).Nanoseconds(), 10)
 }
