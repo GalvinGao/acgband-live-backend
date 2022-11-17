@@ -46,9 +46,15 @@ func (s liveServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		t := r.FormValue("time")
+		t := r.FormValue("offsetsecs")
 		if t == "" {
 			t = currentClock()
+		} else {
+			offset, err := strconv.Atoi(t)
+			if err != nil {
+				offset = 0
+			}
+			t = strconv.FormatInt(time.Now().Add(time.Second*time.Duration(offset)).Sub(baseTime).Nanoseconds(), 10)
 		}
 
 		fanout([]byte("servermsg " + t + " " + msg))
