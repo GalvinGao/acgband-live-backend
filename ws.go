@@ -46,7 +46,12 @@ func (s liveServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		fanout([]byte("servermsg " + currentClock() + " " + msg))
+		t := r.FormValue("time")
+		if t == "" {
+			t = currentClock()
+		}
+
+		fanout([]byte("servermsg " + t + " " + msg))
 		w.WriteHeader(http.StatusNoContent)
 		return
 	}
