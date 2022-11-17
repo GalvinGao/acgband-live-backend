@@ -56,7 +56,7 @@ func (s liveServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 func (s liveServer) handleWs(c *websocket.Conn, r *http.Request) {
 	l := rate.NewLimiter(rate.Every(time.Millisecond*30), 10)
-	go s.writePump(r.Context(), c)
+	go s.writePump(context.Background(), c)
 	for {
 		err := s.readPump(context.Background(), c, l)
 		if websocket.CloseStatus(err) == websocket.StatusNormalClosure {
